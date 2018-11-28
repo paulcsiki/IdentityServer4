@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using IdentityServer4.Extensions;
 using IdentityServer4.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Linq;
 
 namespace IdentityServer4.Endpoints.Results
 {
@@ -77,6 +78,12 @@ namespace IdentityServer4.Endpoints.Results
             }
 
             var url = _url.AddQueryString(_options.UserInteraction.CustomRedirectReturnUrlParameter, returnUrl);
+            if (context.IsAjax())
+            {
+                JObject returnObject = new JObject {[_options.UserInteraction.ConsentReturnUrlParameter] = url};
+                return Task.Run(async () => await context.Response.WriteAsync(returnObject.ToString()));
+            }
+
             context.Response.RedirectToAbsoluteUrl(url);
 
             return Task.CompletedTask;

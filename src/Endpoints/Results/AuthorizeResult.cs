@@ -16,6 +16,7 @@ using IdentityServer4.Stores;
 using IdentityServer4.ResponseHandling;
 using Microsoft.AspNetCore.Authentication;
 using System.Text.Encodings.Web;
+using Newtonsoft.Json.Linq;
 
 namespace IdentityServer4.Endpoints.Results
 {
@@ -110,10 +111,20 @@ namespace IdentityServer4.Endpoints.Results
                 Response.Request.ResponseMode == OidcConstants.ResponseModes.Fragment)
             {
                 context.Response.SetNoCache();
-                context.Response.Redirect(BuildRedirectUri());
+                if (context.IsAjax())
+                {
+                    JObject returnObject = new JObject {[_options.UserInteraction.ConsentReturnUrlParameter] = BuildRedirectUri()};
+                    await context.Response.WriteAsync(returnObject.ToString());
+                }
+                else
+                {
+                    context.Response.Redirect(BuildRedirectUri());
+                }
             }
             else if (Response.Request.ResponseMode == OidcConstants.ResponseModes.FormPost)
             {
+                if (context.IsAjax())
+                    throw new Exception("Not yet supported - form post xhr response.");
                 context.Response.SetNoCache();
                 AddSecurityHeaders(context);
                 await context.Response.WriteHtmlAsync(GetFormPostHtml());
@@ -197,7 +208,15 @@ namespace IdentityServer4.Endpoints.Results
             var errorUrl = _options.UserInteraction.ErrorUrl;
 
             var url = errorUrl.AddQueryString(_options.UserInteraction.ErrorIdParameter, id);
-            context.Response.RedirectToAbsoluteUrl(url);
+            if (context.IsAjax())
+            {
+                JObject returnObject = new JObject(errorModel) {[_options.UserInteraction.ConsentReturnUrlParameter] = url};
+                await context.Response.WriteAsync(returnObject.ToString());
+            }
+            else
+            {
+                context.Response.RedirectToAbsoluteUrl(url);
+            }
         }
     }
 }
