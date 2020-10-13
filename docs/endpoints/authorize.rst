@@ -8,6 +8,10 @@ This process typically involves authentication of the end-user and optionally co
 
 ``client_id``
     identifier of the client (required).
+``request``
+    instead of providing all parameters as individual query string parameters, you can provide a subset or all of them as a JWT
+``request_uri``
+    URL of a pre-packaged JWT containing request parameters
 ``scope``
     one or more registered scopes (required)
 ``redirect_uri`` 
@@ -42,7 +46,7 @@ This process typically involves authentication of the end-user and optionally co
     sends the code challenge for PKCE
 ``code_challenge_method``
     ``plain`` indicates that the challenge is using plain text (not recommended)
-    ``S256`` indicates the the challenge is hashed with SHA256
+    ``S256`` indicates the challenge is hashed with SHA256
 ``login_hint``
     can be used to pre-fill the username field on the login page
 ``ui_locales``
