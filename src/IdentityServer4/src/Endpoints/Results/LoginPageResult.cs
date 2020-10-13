@@ -63,7 +63,7 @@ namespace IdentityServer4.Endpoints.Results
             if (context.IsAjax())
             {
                 context.Response.StatusCode = (int) System.Net.HttpStatusCode.Unauthorized;
-                return Task.CompletedTask;
+                return;
             }
             
             Init(context);

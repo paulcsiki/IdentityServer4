@@ -87,7 +87,8 @@ namespace IdentityServer4.Endpoints.Results
             if (context.IsAjax())
             {
                 JObject returnObject = new JObject {[_options.UserInteraction.ConsentReturnUrlParameter] = url};
-                return Task.Run(async () => await context.Response.WriteAsync(returnObject.ToString()));
+                await context.Response.WriteAsync(returnObject.ToString());
+                return;
             }
 
             context.Response.RedirectToAbsoluteUrl(url);
